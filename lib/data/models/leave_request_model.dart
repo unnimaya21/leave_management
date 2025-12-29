@@ -38,9 +38,9 @@ class LeaveRequest extends LeaveRequestEntity {
       leaveType: json['leaveType'] ?? '',
       startDate: DateTime.parse(json['startDate']),
       endDate: DateTime.parse(json['endDate']),
-      reason: json['reason'],
+      reason: json['reason'] ?? '',
       totalDays: json['totalDays'] ?? 0,
-      status: json['status'],
+      status: json['status'] ?? '',
       requestedAt: DateTime.parse(json['requestedAt']),
       approvedAt: json['approvedAt'] != null
           ? DateTime.parse(json['approvedAt'])

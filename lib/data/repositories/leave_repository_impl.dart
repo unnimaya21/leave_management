@@ -15,7 +15,7 @@ class LeaveRepositoryImpl implements LeaveRepository {
         data: leaveRequest.toJson(),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return LeaveRequest.fromJson(response.data);
+        return LeaveRequest.fromJson(response.data['data']);
       } else {
         throw Exception(
           'Failed to create leave request: ${response.statusMessage}',
