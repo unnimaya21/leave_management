@@ -16,8 +16,6 @@ class LeaveRepositoryImpl implements LeaveRepository {
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         return LeaveRequest.fromJson(response.data);
-      } else if (response.statusCode == 401) {
-        throw Exception('Unauthorized: Please log in again.');
       } else {
         throw Exception(
           'Failed to create leave request: ${response.statusMessage}',
@@ -29,7 +27,6 @@ class LeaveRepositoryImpl implements LeaveRepository {
       message = error.response?.data['message'] ?? error.message ?? message;
       ErrorService.showError(message);
       throw Exception('Failed to create leave request: $message');
-      // Handle specific Dio errors (timeout, 404, etc.)
     } catch (e) {
       throw Exception('Failed to create leave request: $e');
     }

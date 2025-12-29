@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:leave_management/core/constants/app_defaults.dart';
 import 'package:leave_management/presentation/pages/dashboard/dashboard.dart';
+import 'package:leave_management/presentation/pages/dashboard/dashboard_graph_screen.dart';
 import 'package:leave_management/presentation/pages/profile/profile_screen.dart';
 
 import 'components/app_navigation_bar.dart';
@@ -26,7 +27,7 @@ class _EntryPointUIState extends State<EntryPointUI> {
 
   /// All the pages
   List<Widget> pages = [
-    const SizedBox(), LeaveDashboard(),
+    const DashBoardGraphScreen(), LeaveDashboard(),
     ProfileScreen(),
     // const MenuPage(),
     // const CartPage(isHomePage: true),

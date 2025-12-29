@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+import 'package:leave_management/core/utils/date_formats.dart';
 import 'package:leave_management/data/models/leave_category_model.dart';
 import 'package:leave_management/data/models/leave_request_model.dart';
 import 'package:leave_management/presentation/pages/leave/apply_leave.dart';
@@ -20,7 +20,7 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
   int totalUsed = 0;
   int totalLeaves = 0;
   int totalPending = 0;
-  final format = DateFormat('dd MMM');
+
   @override
   void initState() {
     super.initState();
@@ -159,7 +159,7 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
                         ),
                         title: Text(request.leaveType.toUpperCase()),
                         subtitle: Text(
-                          '${format.format(request.startDate)} to ${format.format(request.endDate)}',
+                          '${ddMMMFormat.format(request.startDate)} to ${ddMMMFormat.format(request.endDate)}',
                         ),
                         trailing: _buildStatusChip(request.status),
                       ),
@@ -267,7 +267,7 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Duration: ${format.format(request.startDate)} - ${format.format(request.endDate)}",
+              "Duration: ${ddMMMFormat.format(request.startDate)} - ${ddMMMFormat.format(request.endDate)}",
             ),
             const SizedBox(height: 8),
             Text("Reason: ${request.reason}"),

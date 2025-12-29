@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart'; // Add this for date formatting
 import 'package:leave_management/core/constants/app_defaults.dart';
 import 'package:leave_management/core/constants/app_icons.dart';
+import 'package:leave_management/core/utils/date_formats.dart';
 import 'package:leave_management/core/utils/validators.dart';
 import 'package:leave_management/data/models/user_model.dart';
 import 'package:leave_management/presentation/providers/auth_provider.dart';
@@ -27,6 +28,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
   final TextEditingController joinDateController = TextEditingController();
 
   String? selectedDepartment;
+  User? existingUser;
   final List<String> departments = [
     "Development",
     "HR",
@@ -34,6 +36,33 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
     "Marketing",
     "Other",
   ];
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isFromEdit) {
+      existingUser = ref.read(userProvider).value;
+      if (existingUser != null) {
+        print(
+          "Editing user: ${existingUser!.department}   ${existingUser!.department[0].toUpperCase() + existingUser!.department.substring(1)}",
+        );
+        userName.text = existingUser!.username;
+        userEmail.text = existingUser!.email;
+        designation.text = existingUser!.designation;
+        joinDateController.text = ddmmYYYYFormat.format(
+          DateTime.parse(existingUser!.joinedDate),
+        );
+        int deptIndex = departments.indexWhere(
+          (dept) =>
+              dept.toLowerCase() == existingUser!.department.toLowerCase(),
+        );
+        selectedDepartment = departments[deptIndex];
+
+        print("Selected Department: $selectedDepartment $departments");
+      } else {
+        print("No existing user data found for editing.");
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

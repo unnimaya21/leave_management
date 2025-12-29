@@ -33,6 +33,7 @@ class ProfileScreen extends ConsumerWidget {
           if (user == null) {
             return const Center(child: Text("No user data found"));
           }
+          print('User data in ProfileScreen: ${user.joinedDate}');
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),

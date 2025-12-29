@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:leave_management/data/models/leave_category_model.dart';
 import 'package:leave_management/data/models/leave_request_model.dart';
 import 'package:leave_management/data/repositories/leave_repository_impl.dart';
 import 'package:leave_management/di/di.dart';
@@ -31,4 +32,8 @@ final withdrawLeaveRequestProvider = FutureProvider.family<bool, String>((
 ) async {
   final leaveRepository = ref.watch(leaveRepositoryProvider);
   return await leaveRepository.withdrawLeaveRequest(requestId);
+});
+final leaveBalancesProvider = FutureProvider<List<LeaveCategory>>((ref) async {
+  final repository = ref.watch(leaveRepositoryProvider);
+  return repository.getLeaveBalances();
 });

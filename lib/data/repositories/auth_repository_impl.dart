@@ -99,7 +99,16 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final response = await _dio.patch('/users/updateMe', data: user.toJson());
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print('User updated successfully.');
+        await _sharedPrefService.remove(StorageConstants.userKey);
+        User updatedUser = User.fromJson(response.data['data']['user']);
+        await _sharedPrefService.saveUser(updatedUser);
+        await _sharedPrefService.getUser().then((value) {
+          print('Updated user from Shared Preferences: ${value?.toJson()}');
+        });
+        print('User updated successfully. ${(response.data['data']['user'])}');
+
+        // await _sharedPrefService.saveUser(User.fromJson(response.data['user']));
+
         return true;
       } else {
         print('Failed to update user. Status code: ${response.statusCode}');

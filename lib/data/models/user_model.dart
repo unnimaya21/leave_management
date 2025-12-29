@@ -21,7 +21,7 @@ class User extends UserEntity {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['_id'],
+      id: json['_id'] ?? '',
       username: json['username'],
       email: json['email'],
       password: json['password'] ?? '',
