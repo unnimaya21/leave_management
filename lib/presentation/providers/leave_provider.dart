@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leave_management/data/models/leave_category_model.dart';
+import 'package:leave_management/data/models/leave_report_model.dart';
 import 'package:leave_management/data/models/leave_request_model.dart';
 import 'package:leave_management/data/repositories/leave_repository_impl.dart';
 import 'package:leave_management/di/di.dart';
@@ -37,3 +38,16 @@ final leaveBalancesProvider = FutureProvider<List<LeaveCategory>>((ref) async {
   final repository = ref.watch(leaveRepositoryProvider);
   return repository.getLeaveBalances();
 });
+
+// The .family modifier allows us to pass 'params'
+final leaveReportProvider =
+    FutureProvider.family<List<DailyLeaveReport>, ReportParams>((
+      ref,
+      params,
+    ) async {
+      final repository = ref.watch(leaveRepositoryProvider);
+
+      // Call the repository with the passed month and year
+      return repository.getDayWiseLeaveReport(params.month, params.year);
+    });
+typedef ReportParams = ({String month, String year});

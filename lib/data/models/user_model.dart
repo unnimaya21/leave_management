@@ -9,6 +9,7 @@ class User extends UserEntity {
     required String department,
     required String designation,
     required String joinedDate,
+    String? role,
   }) : super(
          id: id!,
          username: username,
@@ -17,6 +18,7 @@ class User extends UserEntity {
          department: department,
          designation: designation,
          joinedDate: joinedDate,
+         role: role!,
        );
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,7 @@ class User extends UserEntity {
       id: json['_id'] ?? '',
       username: json['username'],
       email: json['email'],
+      role: json['role'] ?? '',
       password: json['password'] ?? '',
       department: json['department'] ?? '',
       designation: json['designation'] ?? '',
@@ -37,6 +40,7 @@ class User extends UserEntity {
       'email': email,
       if (password != '') 'password': password,
       if (password != '') 'confirmPassword': password,
+      'role': role,
       'department': department,
       'designation': designation,
       'joinedDate': joinedDate,

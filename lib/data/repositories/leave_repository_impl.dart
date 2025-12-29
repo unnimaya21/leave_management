@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:leave_management/core/services/error_service.dart';
 import 'package:leave_management/data/models/leave_category_model.dart';
+import 'package:leave_management/data/models/leave_report_model.dart';
 import 'package:leave_management/data/models/leave_request_model.dart';
 import 'package:leave_management/domain/repositories/leave_repository.dart';
 
@@ -37,15 +38,17 @@ class LeaveRepositoryImpl implements LeaveRepository {
     try {
       final response = await _dio.get('/leaves');
       if (response.statusCode == 200) {
-        final data = response.data;
-        if (data is Map<String, dynamic> && data['data'] is List<dynamic>) {
-          final List<dynamic> leaveRequestsJson = data['data'];
-          return leaveRequestsJson
-              .map((json) => LeaveRequest.fromJson(json))
-              .toList();
-        } else {
-          throw Exception('Unexpected response format');
-        }
+        final List<dynamic> rawData = response.data['data'];
+
+        // Use .map().toList() directly on the raw data
+        // This is safer and more performant for Clean Architecture
+        return rawData.map((json) {
+          try {
+            return LeaveRequest.fromJson(json as Map<String, dynamic>);
+          } catch (e) {
+            rethrow;
+          }
+        }).toList();
       } else {
         throw Exception(
           'Failed to fetch leave requests: ${response.statusMessage}',
@@ -53,7 +56,6 @@ class LeaveRepositoryImpl implements LeaveRepository {
       }
     } on DioException catch (error) {
       String message = "Something went wrong!";
-
       message = error.response?.data['message'] ?? error.message ?? message;
       ErrorService.showError(message);
       throw Exception('Failed to fetch leave requests: $message');
@@ -61,6 +63,36 @@ class LeaveRepositoryImpl implements LeaveRepository {
       throw Exception('Failed to fetch leave requests: $e');
     }
   }
+
+  // @override
+  // Future<List<LeaveRequest>> getLeaveRequests() async {
+  //   try {
+  //     final response = await _dio.get('/leaves');
+  //     if (response.statusCode == 200) {
+  //       final data = response.data;
+  //       if (data is Map<String, dynamic> && data['data'] is List<dynamic>) {
+  //         final List<dynamic> leaveRequestsJson = data['data'];
+  //         return leaveRequestsJson
+  //             .map((json) => LeaveRequest.fromJson(json))
+  //             .toList();
+  //       } else {
+  //         throw Exception('Unexpected response format');
+  //       }
+  //     } else {
+  //       throw Exception(
+  //         'Failed to fetch leave requests: ${response.statusMessage}',
+  //       );
+  //     }
+  //   } on DioException catch (error) {
+  //     String message = "Something went wrong!";
+
+  //     message = error.response?.data['message'] ?? error.message ?? message;
+  //     ErrorService.showError(message);
+  //     throw Exception('Failed to fetch leave requests: $message');
+  //   } catch (e) {
+  //     throw Exception('Failed to fetch leave requests: $e');
+  //   }
+  // }
 
   @override
   Future<bool> withdrawLeaveRequest(String requestId) {
@@ -111,6 +143,72 @@ class LeaveRepositoryImpl implements LeaveRepository {
           error.response?.data['message'] ?? error.message ?? "Error";
       ErrorService.showError(message);
       throw Exception(message);
+    }
+  }
+
+  @override
+  Future<bool> approveLeaveRequest(String requestId) {
+    try {
+      return _dio
+          .patch(
+            '/leaves/update-leave/$requestId',
+            data: {'status': 'approved'},
+          )
+          .then((response) {
+            if (response.statusCode == 200) {
+              return true;
+            } else {
+              throw Exception(
+                'Failed to approve leave request: ${response.statusMessage}',
+              );
+            }
+          });
+    } on DioException catch (error) {
+      String message = "Something went wrong!";
+
+      message = error.response?.data['message'] ?? error.message ?? message;
+      ErrorService.showError(message);
+      throw Exception('Failed to approve leave request: $message');
+    } catch (e) {
+      throw Exception('Failed to approve leave request: $e');
+    }
+  }
+
+  @override
+  Future<List<DailyLeaveReport>> getDayWiseLeaveReport(
+    String month,
+    String year,
+  ) async {
+    try {
+      final response = await _dio.get(
+        '/leaves/day-wise-report',
+        data: {"month": month, "year": year},
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> rawData = response.data['data'];
+
+        // Use .map().toList() directly on the raw data
+        // This is safer and more performant for Clean Architecture
+        return rawData.map((json) {
+          try {
+            return DailyLeaveReport.fromJson(json as Map<String, dynamic>);
+          } catch (e) {
+            rethrow;
+          }
+        }).toList();
+      } else {
+        throw Exception(
+          'Failed to fetch leave requests: ${response.statusMessage}',
+        );
+      }
+    } on DioException catch (error) {
+      String message = "Something went wrong!";
+
+      message = error.response?.data['message'] ?? error.message ?? message;
+      ErrorService.showError(message);
+      throw Exception('Failed to approve leave request: $message');
+    } catch (e) {
+      throw Exception('Failed to approve leave request: $e');
     }
   }
 }

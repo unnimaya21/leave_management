@@ -42,6 +42,7 @@ class SharedPrefService {
     String? userJson = prefs.getString(StorageConstants.userKey);
 
     if (userJson != null) {
+      print('.................User fetched from Shared Preferences: $userJson');
       return User.fromJson(jsonDecode(userJson));
     }
     return null;

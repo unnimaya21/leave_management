@@ -27,6 +27,7 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
     // Fetch user and leave requests when the dashboard is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       requests = await ref.read(leaveRepositoryProvider).getLeaveRequests();
+
       balances = await ref.read(leaveRepositoryProvider).getLeaveBalances();
 
       for (var balance in balances) {
@@ -43,6 +44,11 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
   Widget build(BuildContext context) {
     final ref = this.ref;
     final userAsync = ref.watch(userProvider);
+    // Extract userRole from userAsync
+    String userRole = '';
+    if (userAsync is AsyncData && userAsync.value != null) {
+      userRole = userAsync.value!.role;
+    }
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -80,50 +86,37 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 20),
 
-              // // --- Leave Balance Grid ---
-              // GridView.count(
-              //   crossAxisCount: 2,
-              //   shrinkWrap: true,
-              //   physics: const NeverScrollableScrollPhysics(),
-              //   crossAxisSpacing: 16,
-              //   mainAxisSpacing: 16,
-              //   childAspectRatio: 1.5,
-              //   children: [
-              //     _buildStatCard("Annual Leave", "12", Colors.blue),
-              //     _buildStatCard("Sick Leave", "05", Colors.orange),
-              //     _buildStatCard("Casual Leave", "03", Colors.green),
-              //     _buildStatCard("Used Total", "08", Colors.red),
-              //   ],
-              // ),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 1.4,
-                ),
-                itemCount: balances.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == balances.length) {
+              const SizedBox(height: 20),
+              if (userRole == 'employee')
+                // --- Leave Balances Grid ---
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 1.4,
+                  ),
+                  itemCount: balances.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == balances.length) {
+                      return _buildStatCard(
+                        "Total Used",
+                        '${totalUsed + totalPending}/$totalLeaves',
+                        Colors.redAccent, // Distinct color for the total
+                      );
+                    }
+                    final balance = balances[index];
                     return _buildStatCard(
-                      "Total Used",
-                      '${totalUsed + totalPending}/$totalLeaves',
-                      Colors.redAccent, // Distinct color for the total
+                      '${balance.name[0].toUpperCase()}${balance.name.substring(1)} Leave', // Capitalize
+                      '${balance.used + balance.pending}/${balance.available.toString()}',
+                      _getCategoryColor(balance.name),
                     );
-                  }
-                  final balance = balances[index];
-                  return _buildStatCard(
-                    '${balance.name[0].toUpperCase()}${balance.name.substring(1)} Leave', // Capitalize
-                    '${balance.used + balance.pending}/${balance.available.toString()}',
-                    _getCategoryColor(balance.name),
-                  );
-                },
-              ),
-              const SizedBox(height: 30),
+                  },
+                ),
+              if (userRole == 'employee') const SizedBox(height: 30),
               const Text(
                 "Recent Requests",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -138,7 +131,7 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
                 itemBuilder: (context, index) {
                   LeaveRequest request = requests[index];
                   return InkWell(
-                    onTap: () => _showRequestDetails(request),
+                    onTap: () => _showRequestDetails(request, userRole),
                     child: Card(
                       margin: const EdgeInsets.only(bottom: 12),
                       shape: RoundedRectangleBorder(
@@ -157,11 +150,23 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
                               ? Icon(Icons.money_off, color: Colors.white)
                               : Icon(Icons.event_note, color: Colors.white),
                         ),
-                        title: Text(request.leaveType.toUpperCase()),
-                        subtitle: Text(
-                          '${ddMMMFormat.format(request.startDate)} to ${ddMMMFormat.format(request.endDate)}',
+                        title: Row(
+                          children: [
+                            Text(request.leaveType!.toUpperCase()),
+                            if (userRole == 'admin')
+                              Text(
+                                '- ${request.userId!.username!}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                          ],
                         ),
-                        trailing: _buildStatusChip(request.status),
+                        subtitle: Text(
+                          '${ddMMMFormat.format(request.startDate!)} to ${ddMMMFormat.format(request.endDate!)}',
+                        ),
+                        trailing: _buildStatusChip(request.status!),
                       ),
                     ),
                   );
@@ -171,11 +176,13 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => showApplyLeavePopup(context),
-        label: const Text("Apply Leave"),
-        icon: const Icon(Icons.add),
-      ),
+      floatingActionButton: userRole != 'admin'
+          ? FloatingActionButton.extended(
+              onPressed: () => showApplyLeavePopup(context),
+              label: const Text("Apply Leave"),
+              icon: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 
@@ -257,22 +264,26 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
     );
   }
 
-  void _showRequestDetails(LeaveRequest request) {
+  void _showRequestDetails(LeaveRequest request, String userRole) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("${request.leaveType.toUpperCase()} Request"),
+        title: Text(
+          "${request.leaveType![0].toUpperCase()}${request.leaveType!.substring(1)} Request",
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 8,
           children: [
+            if (userRole == 'admin') Text("User: ${request.userId!.username}"),
             Text(
-              "Duration: ${ddMMMFormat.format(request.startDate)} - ${ddMMMFormat.format(request.endDate)}",
+              "Duration: ${ddMMMFormat.format(request.startDate!)} - ${ddMMMFormat.format(request.endDate!)}",
             ),
-            const SizedBox(height: 8),
+
             Text("Reason: ${request.reason}"),
-            const SizedBox(height: 8),
-            Text("Status: ${request.status.toUpperCase()}"),
+
+            Text("Status: ${request.status!.toUpperCase()}"),
           ],
         ),
         actions: [
@@ -281,19 +292,60 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
             child: const Text("Close"),
           ),
           // ONLY SHOW WITHDRAW BUTTON IF PENDING
-          if (request.status.toLowerCase() == 'pending')
+          if (request.status!.toLowerCase() == 'pending')
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: userRole == 'admin'
+                    ? Colors.green
+                    : Colors.red,
                 foregroundColor: Colors.white,
               ),
-              onPressed: () =>
-                  _handleWithdraw(request.id!), // Pass the document/request ID
-              child: const Text("Withdraw Request"),
+              onPressed: () => userRole == 'admin'
+                  ? approveRequest(request.sId!)
+                  : _handleWithdraw(
+                      request.sId!,
+                    ), // Pass the document/request ID
+              child: Text(
+                userRole == 'admin' ? 'Approve Request' : "Withdraw Request",
+              ),
             ),
         ],
       ),
     );
+  }
+
+  void approveRequest(String requestId) async {
+    try {
+      // Show a loading indicator
+      showDialog(
+        context: context,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      // Call API (Ensure this method exists in your repository)
+      await ref.read(leaveRepositoryProvider).approveLeaveRequest(requestId);
+
+      if (mounted) {
+        Navigator.pop(context); // Close loading
+        Navigator.pop(context); // Close details dialog
+
+        // Refresh the list locally
+        final updatedRequests = await ref
+            .read(leaveRepositoryProvider)
+            .getLeaveRequests();
+        setState(() {
+          requests = updatedRequests;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Leave request approved successfully")),
+        );
+        await ref.read(leaveRepositoryProvider).getLeaveBalances();
+      }
+    } catch (e) {
+      if (mounted) Navigator.pop(context);
+      print("Approve Error: $e");
+    }
   }
 
   void _handleWithdraw(String requestId) async {

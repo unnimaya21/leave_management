@@ -43,7 +43,6 @@ class AuthRepositoryImpl implements AuthRepository {
         '/auth/login',
         data: {'email': email, 'password': password},
       );
-      print('=====response from signup: ${response.statusCode}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         final token =
             response.data['token']; // Assuming the token is in the response

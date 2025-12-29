@@ -12,6 +12,7 @@ class LeaveRequestEntity extends Equatable {
   final DateTime? requestedAt;
   final DateTime? approvedAt;
   final DateTime? rejectedAt;
+  final UserID? userID;
 
   LeaveRequestEntity({
     this.id,
@@ -25,6 +26,7 @@ class LeaveRequestEntity extends Equatable {
     this.requestedAt,
     this.approvedAt,
     this.rejectedAt,
+    this.userID,
   });
   @override
   List<Object?> get props => [
@@ -39,5 +41,18 @@ class LeaveRequestEntity extends Equatable {
     requestedAt,
     approvedAt,
     rejectedAt,
+    userID,
   ];
+}
+
+// User model for nested userID
+class UserID {
+  final String username;
+  final String id;
+
+  UserID({required this.username, required this.id});
+
+  factory UserID.fromJson(Map<String, dynamic> json) {
+    return UserID(username: json['username'], id: json['_id']);
+  }
 }

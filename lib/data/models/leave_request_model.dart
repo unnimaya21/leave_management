@@ -1,53 +1,79 @@
-import 'package:leave_management/domain/entities/leave_request_entity.dart';
+class LeaveRequest {
+  String? sId;
+  UserId? userId;
+  String? leaveType;
+  DateTime? startDate;
+  DateTime? endDate;
+  String? reason;
+  int? totalDays;
+  String? status;
+  String? requestedAt;
+  int? iV;
 
-class LeaveRequest extends LeaveRequestEntity {
   LeaveRequest({
-    super.userId,
-    super.id,
-    required super.leaveType,
-    required super.startDate,
-    required super.endDate,
-    required super.reason,
-    required super.totalDays,
-    required super.status,
-    super.requestedAt,
-    super.approvedAt,
-    super.rejectedAt,
+    this.sId,
+    this.userId,
+    this.leaveType,
+    this.startDate,
+    this.endDate,
+    this.reason,
+    this.totalDays,
+    this.status,
+    this.requestedAt,
+    this.iV,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      if (userId != null) 'userId': userId,
-      if (id != null) '_id': id,
-      'leaveType': leaveType,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
-      'reason': reason,
-      'totalDays': totalDays,
-      'status': status,
-      if (requestedAt != null) 'requestedAt': requestedAt!.toIso8601String(),
-      if (approvedAt != null) 'approvedAt': approvedAt?.toIso8601String(),
-      if (rejectedAt != null) 'rejectedAt': rejectedAt?.toIso8601String(),
-    };
+  LeaveRequest.fromJson(Map<String, dynamic> json) {
+    print('0======${json['userId']} === $json');
+    sId = json['_id'];
+    userId = json['userId'] != null
+        ? UserId.fromJson(json['userId'])
+        : UserId(sId: '', username: '');
+    leaveType = json['leaveType'];
+    startDate = json['startDate'] != null
+        ? DateTime.parse(json['startDate'])
+        : null;
+    endDate = json['endDate'] != null ? DateTime.parse(json['endDate']) : null;
+    reason = json['reason'];
+    totalDays = json['totalDays'];
+    status = json['status'];
+    requestedAt = json['requestedAt'];
+    iV = json['__v'];
   }
 
-  factory LeaveRequest.fromJson(Map<String, dynamic> json) {
-    return LeaveRequest(
-      id: json['_id'],
-      userId: json['userId'],
-      leaveType: json['leaveType'] ?? '',
-      startDate: DateTime.parse(json['startDate']),
-      endDate: DateTime.parse(json['endDate']),
-      reason: json['reason'] ?? '',
-      totalDays: json['totalDays'] ?? 0,
-      status: json['status'] ?? '',
-      requestedAt: DateTime.parse(json['requestedAt']),
-      approvedAt: json['approvedAt'] != null
-          ? DateTime.parse(json['approvedAt'])
-          : null,
-      rejectedAt: json['rejectedAt'] != null
-          ? DateTime.parse(json['rejectedAt'])
-          : null,
-    );
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['_id'] = this.sId;
+    if (this.userId != null) {
+      data['userId'] = this.userId!.toJson();
+    }
+    data['leaveType'] = this.leaveType;
+    data['startDate'] = this.startDate;
+    data['endDate'] = this.endDate;
+    data['reason'] = this.reason;
+    data['totalDays'] = this.totalDays;
+    data['status'] = this.status;
+    data['requestedAt'] = this.requestedAt;
+    data['__v'] = this.iV;
+    return data;
+  }
+}
+
+class UserId {
+  String? sId;
+  String? username;
+
+  UserId({this.sId, this.username});
+
+  UserId.fromJson(Map<String, dynamic> json) {
+    sId = json['_id'] ?? '';
+    username = json['username'] ?? '';
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data['_id'] = this.sId;
+    data['username'] = this.username;
+    return data;
   }
 }
