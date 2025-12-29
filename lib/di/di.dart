@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:leave_management/core/constants/storage_constants.dart';
@@ -7,7 +6,6 @@ import 'package:leave_management/core/constants/string_constants.dart';
 import 'package:leave_management/core/services/error_service.dart'
     show ErrorService;
 import 'package:leave_management/core/utils/shared_pref_service.dart';
-import 'package:leave_management/presentation/providers/auth_provider.dart';
 import 'package:leave_management/routes/app_routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
