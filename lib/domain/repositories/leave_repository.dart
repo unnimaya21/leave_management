@@ -7,7 +7,7 @@ abstract class LeaveRepository {
   Future<List<LeaveRequest>> getLeaveRequests();
   Future<bool> withdrawLeaveRequest(String requestId);
   Future<List<LeaveCategory>> getLeaveBalances();
-  Future<bool> approveLeaveRequest(String requestId);
+  Future<bool> updateLeaveRequest(LeaveRequest request);
   Future<List<DailyLeaveReport>> getDayWiseLeaveReport(
     String month,
     String year,

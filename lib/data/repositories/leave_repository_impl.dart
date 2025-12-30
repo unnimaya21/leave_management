@@ -64,36 +64,6 @@ class LeaveRepositoryImpl implements LeaveRepository {
     }
   }
 
-  // @override
-  // Future<List<LeaveRequest>> getLeaveRequests() async {
-  //   try {
-  //     final response = await _dio.get('/leaves');
-  //     if (response.statusCode == 200) {
-  //       final data = response.data;
-  //       if (data is Map<String, dynamic> && data['data'] is List<dynamic>) {
-  //         final List<dynamic> leaveRequestsJson = data['data'];
-  //         return leaveRequestsJson
-  //             .map((json) => LeaveRequest.fromJson(json))
-  //             .toList();
-  //       } else {
-  //         throw Exception('Unexpected response format');
-  //       }
-  //     } else {
-  //       throw Exception(
-  //         'Failed to fetch leave requests: ${response.statusMessage}',
-  //       );
-  //     }
-  //   } on DioException catch (error) {
-  //     String message = "Something went wrong!";
-
-  //     message = error.response?.data['message'] ?? error.message ?? message;
-  //     ErrorService.showError(message);
-  //     throw Exception('Failed to fetch leave requests: $message');
-  //   } catch (e) {
-  //     throw Exception('Failed to fetch leave requests: $e');
-  //   }
-  // }
-
   @override
   Future<bool> withdrawLeaveRequest(String requestId) {
     try {
@@ -147,13 +117,10 @@ class LeaveRepositoryImpl implements LeaveRepository {
   }
 
   @override
-  Future<bool> approveLeaveRequest(String requestId) {
+  Future<bool> updateLeaveRequest(LeaveRequest request) {
     try {
       return _dio
-          .patch(
-            '/leaves/update-leave/$requestId',
-            data: {'status': 'approved'},
-          )
+          .patch('/leaves/update-leave/${request.sId}', data: request.toJson())
           .then((response) {
             if (response.statusCode == 200) {
               return true;

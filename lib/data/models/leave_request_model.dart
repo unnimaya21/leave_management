@@ -8,7 +8,7 @@ class LeaveRequest {
   int? totalDays;
   String? status;
   String? requestedAt;
-  int? iV;
+  bool? update;
 
   LeaveRequest({
     this.sId,
@@ -20,7 +20,7 @@ class LeaveRequest {
     this.totalDays,
     this.status,
     this.requestedAt,
-    this.iV,
+    this.update = false,
   });
 
   LeaveRequest.fromJson(Map<String, dynamic> json) {
@@ -44,16 +44,18 @@ class LeaveRequest {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.sId != null) data['_id'] = this.sId;
-    if (this.userId != null) {
+    if (this.userId != null && !this.update!) {
       data['userId'] = this.userId!.toJson();
     }
-    data['leaveType'] = this.leaveType;
-    data['startDate'] = this.startDate!.toIso8601String();
-    data['endDate'] = this.endDate!.toIso8601String();
-    data['reason'] = this.reason;
-    data['totalDays'] = this.totalDays;
+    if (!this.update!) {
+      data['leaveType'] = this.leaveType;
+      data['startDate'] = this.startDate!.toIso8601String();
+      data['endDate'] = this.endDate!.toIso8601String();
+      data['reason'] = this.reason;
+      data['totalDays'] = this.totalDays;
+      if (this.requestedAt != null) data['requestedAt'] = this.requestedAt;
+    }
     data['status'] = this.status;
-    if (this.requestedAt != null) data['requestedAt'] = this.requestedAt;
 
     return data;
   }

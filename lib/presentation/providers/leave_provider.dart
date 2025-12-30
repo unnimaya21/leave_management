@@ -53,4 +53,5 @@ final leaveReportProvider =
 final leaveRequestsProvider = FutureProvider<List<LeaveRequest>>((ref) {
   return ref.watch(leaveRepositoryProvider).getLeaveRequests();
 });
+
 typedef ReportParams = ({String month, String year});
