@@ -46,9 +46,13 @@ final authStateProvider = FutureProvider<String>((ref) async {
   return token;
 });
 final userProvider = FutureProvider<User?>((ref) async {
-  print('.................Fetching user from Shared Preferences');
+  print('=======Fetching user from Shared Preferences');
   final sharedPrefService = SharedPrefService();
-  return await sharedPrefService.getUser();
+  final user = await sharedPrefService.getUser();
+
+  // Debug print to see what is actually coming back
+  print('=======User found: ${user?.username}, Role: ${user?.role}');
+  return user;
 });
 
 final updateUserProvider = FutureProvider.family<bool, User>((ref, user) async {

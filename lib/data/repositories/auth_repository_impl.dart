@@ -50,6 +50,9 @@ class AuthRepositoryImpl implements AuthRepository {
         // Store the token using SharedPrefService
         await _sharedPrefService.saveString(StorageConstants.appToken, token);
         await _sharedPrefService.saveUser(User.fromJson(response.data['user']));
+        await _sharedPrefService.getUser().then((value) {
+          print('======get user from Shared Preferences: ${value?.toJson()}');
+        });
 
         return User.fromJson(
           response.data['user'],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:leave_management/core/constants/app_colors.dart';
 import 'package:leave_management/core/utils/date_formats.dart';
 import 'package:leave_management/data/models/leave_category_model.dart';
 import 'package:leave_management/data/models/leave_request_model.dart';
@@ -60,10 +61,22 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.black),
-            onPressed: () {},
-          ),
+          // --- Notification Icon with Badge for Admins ---
+          if (userRole == 'admin')
+            IconButton(
+              icon: Badge.count(
+                count: requests
+                    .where((r) => r.status?.toLowerCase() == 'pending')
+                    .length,
+                child: const Icon(Icons.notifications),
+              ),
+              onPressed: () {},
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.notifications_none, color: Colors.black),
+              onPressed: () {},
+            ),
         ],
       ),
       body: RefreshIndicator(
@@ -87,7 +100,7 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: userRole != 'admin' ? 20 : 10),
               if (userRole != 'admin')
                 // --- Leave Balances Grid ---
                 GridView.builder(
@@ -116,7 +129,7 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
                     );
                   },
                 ),
-              if (userRole == 'employee') const SizedBox(height: 30),
+              if (userRole != 'admin') const SizedBox(height: 30),
               const Text(
                 "Recent Requests",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -130,43 +143,52 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
                 itemCount: requests.length,
                 itemBuilder: (context, index) {
                   LeaveRequest request = requests[index];
-                  return InkWell(
-                    onTap: () => _showRequestDetails(request, userRole),
-                    child: Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.blueAccent,
-                          child: request.leaveType == 'vacation'
-                              ? Icon(Icons.beach_access, color: Colors.white)
-                              : request.leaveType == 'sick'
-                              ? Icon(Icons.local_hospital, color: Colors.white)
-                              : request.leaveType == 'paid'
-                              ? Icon(Icons.work, color: Colors.white)
-                              : request.leaveType == 'unpaid'
-                              ? Icon(Icons.money_off, color: Colors.white)
-                              : Icon(Icons.event_note, color: Colors.white),
-                        ),
-                        title: Row(
-                          children: [
-                            Text(request.leaveType!.toUpperCase()),
-                            if (userRole == 'admin')
-                              Text(
-                                '- ${request.userId!.username!}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    elevation: 0,
+                    child: InkWell(
+                      splashColor: AppColors.primary.withOpacity(0.1),
+                      highlightColor: Colors.transparent,
+                      onTap: () => _showRequestDetails(request, userRole),
+                      child: Card(
+                        // margin: const EdgeInsets.only(bottom: 12),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.blueAccent,
+                            child: request.leaveType == 'vacation'
+                                ? Icon(Icons.beach_access, color: Colors.white)
+                                : request.leaveType == 'sick'
+                                ? Icon(
+                                    Icons.local_hospital,
+                                    color: Colors.white,
+                                  )
+                                : request.leaveType == 'paid'
+                                ? Icon(Icons.work, color: Colors.white)
+                                : request.leaveType == 'unpaid'
+                                ? Icon(Icons.money_off, color: Colors.white)
+                                : Icon(Icons.event_note, color: Colors.white),
+                          ),
+                          title: Row(
+                            children: [
+                              Text(request.leaveType!.toUpperCase()),
+                              if (userRole == 'admin')
+                                Text(
+                                  '- ${request.userId!.username!}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
-                              ),
-                          ],
+                            ],
+                          ),
+                          subtitle: Text(
+                            '${ddMMMFormat.format(request.startDate!)} to ${ddMMMFormat.format(request.endDate!)}',
+                          ),
+                          trailing: _buildStatusChip(request.status!),
                         ),
-                        subtitle: Text(
-                          '${ddMMMFormat.format(request.startDate!)} to ${ddMMMFormat.format(request.endDate!)}',
-                        ),
-                        trailing: _buildStatusChip(request.status!),
                       ),
                     ),
                   );

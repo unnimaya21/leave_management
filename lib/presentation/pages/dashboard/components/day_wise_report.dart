@@ -55,7 +55,7 @@ class LeaveReportChart extends StatelessWidget {
                       if (index < 0 || index >= reports.length)
                         return const SizedBox();
                       // Show only day number to save space: "2025-12-30" -> "30"
-                      String day = reports[index].sId?.split('-').last ?? '';
+                      String day = reports[index].sId?.split('-').first ?? '';
                       return Text(day, style: const TextStyle(fontSize: 10));
                     },
                   ),

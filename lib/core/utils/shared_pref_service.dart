@@ -42,7 +42,7 @@ class SharedPrefService {
   Future<User?> getUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userJson = prefs.getString(StorageConstants.userKey);
-
+    print('======== USER JSON FROM GET USER $userJson');
     if (userJson != null) {
       print('.................User fetched from Shared Preferences: $userJson');
       return User.fromJson(jsonDecode(userJson));

@@ -8,6 +8,7 @@ class AppTheme {
   static ThemeData get defaultTheme {
     return ThemeData(
       colorSchemeSeed: AppColors.primary,
+      dividerColor: Colors.transparent,
       fontFamily: "Gilroy",
       textTheme: const TextTheme(
         bodyLarge: TextStyle(color: AppColors.placeholder),
@@ -34,9 +35,7 @@ class AppTheme {
           foregroundColor: Colors.white,
           padding: const EdgeInsets.all(AppDefaults.padding),
           elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppDefaults.borderRadius,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: AppDefaults.borderRadius),
           textStyle: const TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
@@ -44,9 +43,7 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.all(AppDefaults.padding),
           elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppDefaults.borderRadius,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: AppDefaults.borderRadius),
           textStyle: const TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
@@ -77,10 +74,7 @@ class AppTheme {
           color: AppColors.placeholder,
         ),
         indicator: UnderlineTabIndicator(
-          borderSide: BorderSide(
-            color: AppColors.primary,
-            width: 2,
-          ),
+          borderSide: BorderSide(color: AppColors.primary, width: 2),
         ),
       ),
     );

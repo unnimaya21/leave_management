@@ -51,18 +51,29 @@ class _LoginPageFormState extends ConsumerState<LoginPageForm> {
     final bool isFormOkay = _formKey.currentState?.validate() ?? false;
     if (isFormOkay) {
       try {
-        // Use ref.read inside functions/callbacks
+        // 1. Perform the login
         final result = await ref.read(
           loginProvider({
             'email': emailController.text,
             'password': passwordController.text,
           }).future,
         );
+
         debugPrint('Login Successful: $result');
-        // ignore: use_build_context_synchronously
+
+        // 2. CRITICAL: Clear the cached 'null' user and re-fetch from disk
+        ref.invalidate(userProvider);
+
+        // 3. Optional: Wait for the provider to finish reading the new data
+        await ref.read(userProvider.future);
+
+        if (!mounted) return;
+
+        // 4. Navigate
         Navigator.pushReplacementNamed(context, AppRoutes.entryPoint);
       } catch (e) {
         debugPrint('Login Error: $e');
+        // Show error snackbar here if needed
       }
     }
   }

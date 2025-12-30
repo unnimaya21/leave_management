@@ -20,6 +20,8 @@ class LeaveManagement extends ConsumerWidget {
         if (token.isEmpty) {
           return const IntroLoginPage();
         } else {
+          // Force a fresh fetch of the user profile
+          ref.invalidate(userProvider);
           return const EntryPointUI();
         }
       },

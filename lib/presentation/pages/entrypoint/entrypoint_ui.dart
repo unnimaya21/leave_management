@@ -39,8 +39,13 @@ class _EntryPointUIState extends ConsumerState<EntryPointUI> {
 
     return userAsync.when(
       data: (user) {
-        final String userRole = user?.role ?? 'employee';
-        print('===== user role $userRole');
+        if (user == null) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        final String userRole = user.role ?? 'employee';
+
         // 2. Define the pages list here based on the role
         final List<Widget> pages = [
           userRole == 'admin'
