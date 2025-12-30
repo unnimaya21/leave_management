@@ -40,11 +40,10 @@ class User extends UserEntity {
       'email': email,
       if (password != '') 'password': password,
       if (password != '') 'confirmPassword': password,
-      'role': role,
+      'role': role ?? 'employee',
       'department': department,
       'designation': designation,
       'joinedDate': joinedDate,
-      if (role != '') 'role': role,
     };
   }
 }

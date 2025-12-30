@@ -50,4 +50,7 @@ final leaveReportProvider =
       // Call the repository with the passed month and year
       return repository.getDayWiseLeaveReport(params.month, params.year);
     });
+final leaveRequestsProvider = FutureProvider<List<LeaveRequest>>((ref) {
+  return ref.watch(leaveRepositoryProvider).getLeaveRequests();
+});
 typedef ReportParams = ({String month, String year});

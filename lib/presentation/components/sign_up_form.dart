@@ -175,12 +175,27 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
               );
 
               if (!widget.isFromEdit) {
-                final result = await ref.read(signUpProvider(user).future);
+                try {
+                  // 1. Wait for Signup to finish
+                  final result = await ref.read(signUpProvider(user).future);
 
-                if (result.email.isNotEmpty) {
-                  // ignore: use_build_context_synchronously
+                  if (result.email.isNotEmpty) {
+                    // 2. IMPORTANT: Invalidate the provider
+                    ref.invalidate(userProvider);
 
-                  Navigator.pushReplacementNamed(context, AppRoutes.entryPoint);
+                    // 3. CRITICAL: Wait for the provider to actually fetch the new data
+                    // from SharedPreferences before navigating
+                    await ref.read(userProvider.future);
+
+                    if (context.mounted) {
+                      Navigator.pushReplacementNamed(
+                        context,
+                        AppRoutes.entryPoint,
+                      );
+                    }
+                  }
+                } catch (e) {
+                  debugPrint("Signup Error: $e");
                 }
               } else {
                 final result = await ref.read(updateUserProvider(user).future);

@@ -190,8 +190,8 @@ class _ApplyLeaveScreenState extends ConsumerState<ApplyLeaveScreen> {
                             .read(leaveRepositoryProvider)
                             .newLeaveRequest(leaveRequest);
 
-                        print("Success: $result");
-
+                        debugPrint("Success: $result");
+                        ref.invalidate(leaveRequestsProvider);
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -200,7 +200,7 @@ class _ApplyLeaveScreenState extends ConsumerState<ApplyLeaveScreen> {
                               ),
                             ),
                           );
-                          Navigator.pop(context);
+                          Navigator.pop(context, true);
                         }
                       }
                     },

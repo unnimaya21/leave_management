@@ -18,7 +18,7 @@ class BottomAppBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
       child: SvgPicture.asset(
         iconLocation,

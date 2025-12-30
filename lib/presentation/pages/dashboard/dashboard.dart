@@ -27,17 +27,7 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
     super.initState();
     // Fetch user and leave requests when the dashboard is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      requests = await ref.read(leaveRepositoryProvider).getLeaveRequests();
-
-      balances = await ref.read(leaveRepositoryProvider).getLeaveBalances();
-
-      for (var balance in balances) {
-        totalUsed += balance.used;
-        totalLeaves += balance.total;
-        totalPending += balance.pending;
-      }
-      print("Fetched ${balances.length} bal requests.");
-      setState(() {});
+      _refreshDashboardData();
     });
   }
 
@@ -124,7 +114,7 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
                     final balance = balances[index];
                     return _buildStatCard(
                       '${balance.name[0].toUpperCase()}${balance.name.substring(1)} Leave', // Capitalize
-                      '${balance.used + balance.pending}/${balance.available.toString()}',
+                      '${balance.used + balance.pending}/${balance.total.toString()}',
                       _getCategoryColor(balance.name),
                     );
                   },
@@ -208,21 +198,41 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
     );
   }
 
-  showApplyLeavePopup(BuildContext context) {
-    showDialog(
+  showApplyLeavePopup(BuildContext context) async {
+    // Capture the result of the dialog
+    final success = await showDialog<bool>(
       context: context,
-      // isScrollControlled: true,
-      // shape: const RoundedRectangleBorder(
-      //   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      // ),
       builder: (context) {
-        return Container(
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-          padding: EdgeInsets.all(10),
-          child: ApplyLeaveScreen(),
-        );
+        return const ApplyLeaveScreen();
       },
     );
+
+    // If successfully submitted, refresh the dashboard data
+    if (success == true) {
+      _refreshDashboardData();
+    }
+  }
+
+  // Move your refresh logic into a reusable method
+  Future<void> _refreshDashboardData() async {
+    final updatedRequests = await ref
+        .read(leaveRepositoryProvider)
+        .getLeaveRequests();
+    final updatedBalances = await ref
+        .read(leaveRepositoryProvider)
+        .getLeaveBalances();
+
+    if (mounted) {
+      setState(() {
+        requests = updatedRequests;
+        balances = updatedBalances;
+
+        // Calculate totals using fold
+        totalUsed = updatedBalances.fold(0, (sum, b) => sum + b.used);
+        totalLeaves = updatedBalances.fold(0, (sum, b) => sum + b.total);
+        totalPending = updatedBalances.fold(0, (sum, b) => sum + b.pending);
+      });
+    }
   }
 
   Widget _buildStatCard(String title, String count, Color color) {
