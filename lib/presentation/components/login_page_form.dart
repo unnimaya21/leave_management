@@ -70,7 +70,12 @@ class _LoginPageFormState extends ConsumerState<LoginPageForm> {
         if (!mounted) return;
 
         // 4. Navigate
-        Navigator.pushReplacementNamed(context, AppRoutes.entryPoint);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRoutes.entryPoint,
+          (route) =>
+              false, // This condition 'false' removes all previous routes
+        );
       } catch (e) {
         debugPrint('Login Error: $e');
         // Show error snackbar here if needed

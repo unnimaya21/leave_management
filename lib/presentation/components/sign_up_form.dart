@@ -188,9 +188,11 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                     await ref.read(userProvider.future);
 
                     if (context.mounted) {
-                      Navigator.pushReplacementNamed(
+                      Navigator.pushNamedAndRemoveUntil(
                         context,
                         AppRoutes.entryPoint,
+                        (route) =>
+                            false, // This condition 'false' removes all previous routes
                       );
                     }
                   }
