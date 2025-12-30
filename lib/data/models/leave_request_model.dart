@@ -24,10 +24,11 @@ class LeaveRequest {
   });
 
   LeaveRequest.fromJson(Map<String, dynamic> json) {
-    print('0======${json['userId']} === $json');
     sId = json['_id'];
     userId = json['userId'] != null
-        ? UserId.fromJson(json['userId'])
+        ? json['userId'] is String
+              ? UserId(sId: json['userId'], username: '')
+              : UserId.fromJson(json['userId'])
         : UserId(sId: '', username: '');
     leaveType = json['leaveType'];
     startDate = json['startDate'] != null
@@ -38,23 +39,22 @@ class LeaveRequest {
     totalDays = json['totalDays'];
     status = json['status'];
     requestedAt = json['requestedAt'];
-    iV = json['__v'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['_id'] = this.sId;
+    if (this.sId != null) data['_id'] = this.sId;
     if (this.userId != null) {
       data['userId'] = this.userId!.toJson();
     }
     data['leaveType'] = this.leaveType;
-    data['startDate'] = this.startDate;
-    data['endDate'] = this.endDate;
+    data['startDate'] = this.startDate!.toIso8601String();
+    data['endDate'] = this.endDate!.toIso8601String();
     data['reason'] = this.reason;
     data['totalDays'] = this.totalDays;
     data['status'] = this.status;
-    data['requestedAt'] = this.requestedAt;
-    data['__v'] = this.iV;
+    if (this.requestedAt != null) data['requestedAt'] = this.requestedAt;
+
     return data;
   }
 }

@@ -33,6 +33,8 @@ class SharedPrefService {
   Future<void> saveUser(User user) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String userJson = jsonEncode(user.toJson());
+
+    print('========SAVE USER $userJson');
     await prefs.setString(StorageConstants.userKey, userJson);
   }
 

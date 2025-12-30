@@ -32,27 +32,6 @@ class _EntryPointUIState extends ConsumerState<EntryPointUI> {
 
   /// All the pages
   List<Widget> pages = [];
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      var user = ref.watch(userProvider);
-      user.when(
-        data: (data) => userRole = data!.role,
-        error: (Object error, StackTrace stackTrace) {},
-        loading: () {},
-      );
-      print('0000000 $user');
-
-      pages = [
-        userRole == 'admin'
-            ? LeaveReportChartPage()
-            : const DashBoardGraphScreen(),
-        LeaveDashboard(),
-        ProfileScreen(),
-      ];
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +40,7 @@ class _EntryPointUIState extends ConsumerState<EntryPointUI> {
     return userAsync.when(
       data: (user) {
         final String userRole = user?.role ?? 'employee';
-
+        print('===== user role $userRole');
         // 2. Define the pages list here based on the role
         final List<Widget> pages = [
           userRole == 'admin'

@@ -17,8 +17,6 @@ class LeaveManagement extends ConsumerWidget {
       error: (err, stack) =>
           Scaffold(body: Center(child: Text('Error loading token: $err'))),
       data: (token) {
-        debugPrint('===== Navigation Check: Token is "$token"');
-
         if (token.isEmpty) {
           return const IntroLoginPage();
         } else {

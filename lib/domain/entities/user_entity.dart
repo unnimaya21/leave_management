@@ -6,7 +6,7 @@ class UserEntity {
   String department;
   String designation;
   String joinedDate;
-  String role;
+  String? role;
   UserEntity({
     required this.id,
     required this.username,
@@ -15,6 +15,6 @@ class UserEntity {
     required this.department,
     required this.designation,
     required this.joinedDate,
-    required this.role,
+    this.role,
   });
 }

@@ -31,7 +31,6 @@ final dioProvider = Provider<Dio>((ref) {
           options.headers['Authorization'] = 'Bearer $token';
         }
 
-        print('====== Request Headers: ${options.headers}');
         return handler.next(options);
       },
       onError: (error, handler) async {
@@ -40,7 +39,7 @@ final dioProvider = Provider<Dio>((ref) {
         if (error.response != null) {
           message = error.response?.data['message'] ?? error.message ?? message;
         } else {
-          message = error.message!;
+          message = error.message ?? message;
         }
 
         if (error.response?.statusCode == 401) {

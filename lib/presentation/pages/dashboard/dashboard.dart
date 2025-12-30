@@ -47,7 +47,7 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
     // Extract userRole from userAsync
     String userRole = '';
     if (userAsync is AsyncData && userAsync.value != null) {
-      userRole = userAsync.value!.role;
+      userRole = userAsync.value!.role ?? '';
     }
 
     return Scaffold(
@@ -88,7 +88,7 @@ class _LeaveDashboardState extends ConsumerState<LeaveDashboard> {
               ),
 
               const SizedBox(height: 20),
-              if (userRole == 'employee')
+              if (userRole != 'admin')
                 // --- Leave Balances Grid ---
                 GridView.builder(
                   shrinkWrap: true,

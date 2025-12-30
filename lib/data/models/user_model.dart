@@ -18,7 +18,7 @@ class User extends UserEntity {
          department: department,
          designation: designation,
          joinedDate: joinedDate,
-         role: role!,
+         role: role,
        );
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -44,6 +44,7 @@ class User extends UserEntity {
       'department': department,
       'designation': designation,
       'joinedDate': joinedDate,
+      if (role != '') 'role': role,
     };
   }
 }
